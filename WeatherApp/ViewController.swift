@@ -76,6 +76,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        onSearchButtonPressed(UIButton())
+        return true
+    }
+    
     @IBAction func onCitiesButtonPressed(_ sender: UIButton) {
         performSegue(withIdentifier: "homeToCitiesSegue", sender: self);
     }
@@ -235,17 +241,3 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
