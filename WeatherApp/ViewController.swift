@@ -11,14 +11,22 @@ import CoreLocation;
 class ViewController: UIViewController, UITextFieldDelegate {
     
     let API_KEY: String = "187719b8c7b14698b73213800252703";
+    var currentWeather: Weather?;
     var weatherArray: Array<Weather>? = Array();
     var locationManager: CLLocationManager?;
     var latlng: String = "";
     var searchQuery = "";
     
+    @IBOutlet weak var celsiusButton: UIButton!
+    
+    
+    @IBOutlet weak var fahrenheitButton: UIButton!
+    
+    
     @IBOutlet weak var textFieldOutlet: UITextField!
     
     
+    @IBOutlet weak var imageOutlet: UIImageView!
     
     @IBOutlet weak var temperatureLabel: UILabel!
     
@@ -34,18 +42,31 @@ class ViewController: UIViewController, UITextFieldDelegate {
         locationManager?.requestWhenInUseAuthorization();
         if let locationMgr = locationManager {
             locationMgr.requestLocation();
-            
-            if latlng != "" {
-                searchLatLng();
-            }
+        }
+    }
+    
+    
+    @IBAction func onNavigatorButtonPressed(_ sender: UIButton) {
+        searchLatLng();
+    }
+    
+    
+    @IBAction func onFahrenheitButtonPressed(_ sender: UIButton) {
+        if let value = currentWeather?.current.heatindex_f {
+            temperatureLabel.text = "\(value)";
+        }
+    }
+    
+    
+    @IBAction func onCelsiusButtonPressed(_ sender: UIButton) {
+        if let value = currentWeather?.current.heatindex_c {
+            temperatureLabel.text = "\(value)";
         }
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        print("in text field");
         switch textField.tag {
         case 0:
-            print("got text field");
             if let value = textField.text {
                 searchQuery = value;
             }
@@ -65,7 +86,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             let uRLSession = URLSession(configuration: .default);
             
             //setup the datatask in the url session thread
-            let dataTask = uRLSession.dataTask(with: url, completionHandler: jokeCompletionHandler(data:response:error:));
+            let dataTask = uRLSession.dataTask(with: url, completionHandler: requestCompletionHandler(data:response:error:));
             
             //run the datatask
             dataTask.resume();
@@ -81,7 +102,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         
         //setup the datatask in the url session thread
-        let dataTask = uRLSession.dataTask(with: url, completionHandler: jokeCompletionHandler(data:response:error:));
+        let dataTask = uRLSession.dataTask(with: url, completionHandler: requestCompletionHandler(data:response:error:));
 
         //run the datatask
         dataTask.resume();
@@ -91,7 +112,9 @@ class ViewController: UIViewController, UITextFieldDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "homeToCitiesSegue" {
             let destination = segue.destination as! CitiesViewController;
-            destination.city = "London";
+            if let array = weatherArray {
+                destination.weatherHistory = array;
+            }
         }
     }
     
@@ -109,7 +132,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     
-    func jokeCompletionHandler(data: Data?, response: URLResponse?, error: Error?) {
+    func requestCompletionHandler(data: Data?, response: URLResponse?, error: Error?) {
             
             //filter out where error does not exist
             if (error == nil) {
@@ -153,10 +176,14 @@ class ViewController: UIViewController, UITextFieldDelegate {
             DispatchQueue.main.async {
                 if let weatherObject = weather {
                     self.weatherArray?.append(weatherObject);
+                    self.currentWeather = weatherObject;
                     print("\(self.weatherArray?.count)");
                     self.temperatureLabel.text = "\(weatherObject.current.heatindex_c)";
                     self.conditionLabel.text = "\(weatherObject.current.condition.text)";
                     self.cityLabel.text = "\(weatherObject.location.name)";
+                    let config = UIImage.SymbolConfiguration(paletteColors: [.systemBlue, .systemOrange]);
+                    self.imageOutlet.preferredSymbolConfiguration = config;
+                    self.imageOutlet.image = UIImage(systemName: "cloud.rain");
                 }
             }
         }
