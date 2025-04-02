@@ -10,7 +10,7 @@ import UIKit
 class CitiesViewController: UIViewController {
     
     @IBOutlet weak var tableViewOutlet: UITableView!
-    var weatherHistory: [Weather] = [];
+    var weatherHistory: [Search] = [];
 
     override func viewDidLoad() {
         super.viewDidLoad();
@@ -37,9 +37,9 @@ extension CitiesViewController: UITableViewDataSource {
         var cell = tableView.dequeueReusableCell(withIdentifier: "weatherCell", for: indexPath);
         let weather = weatherHistory[indexPath.row];
         var contentConfig = cell.defaultContentConfiguration();
-        contentConfig.text = weather.location.name;
-        contentConfig.secondaryText = String(weather.current.heatindex_c);
-        contentConfig.image = UIImage(systemName: "cloud");
+        contentConfig.text = weather.location;
+        contentConfig.secondaryText = "\(weather.temperature) \(weather.scale)";
+        contentConfig.image = UIImage(systemName: weather.iconSystemName);
         cell.contentConfiguration = contentConfig;
         return cell;
     }

@@ -6,8 +6,8 @@
 //
 
 struct Search: Decodable {
-    let location: String;
-    let temperature: Double;
-    let scale: String;
-    let iconSystemName: String;
+    var location: String;
+    var temperature: Double;
+    var scale: String;
+    var iconSystemName: String;
 }
